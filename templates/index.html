@@ -1,0 +1,409 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | {{ profile.title|default:"Développeur" }}</title>
+    
+    <!-- Liens Externes -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    
+    <!-- Fichier CSS Django -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+<body>
+
+<!-- BLOC MESSAGE DE SUCCÈS AVEC AUTO-FERMETURE -->
+{% if messages %}
+    <div id="alert-message" style="position: fixed; top: 100px; left: 50%; transform: translateX(-50%); z-index: 9999; background: linear-gradient(135deg, #00ffe7, #00b8a9); color: #03060f; padding: 15px 30px; border-radius: 50px; font-weight: 700; box-shadow: 0 0 30px rgba(0,255,231,0.6);">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+
+    <!-- Script pour faire disparaître le message après 3 secondes -->
+    <script>
+        setTimeout(function() {
+            const alertBox = document.getElementById('alert-message');
+            if (alertBox) {
+                alertBox.style.transition = 'opacity 0.5s ease';
+                alertBox.style.opacity = '0';
+                // On le supprime du DOM après l'animation
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 3000); // 3000 millisecondes = 3 secondes
+    </script>
+{% endif %}
+
+<!-- CURSEUR -->
+<div id="cur"></div>
+<!-- ... suite du code ... -->
+<!-- CURSEUR -->
+<div id="cur"></div>
+<div id="curl"></div>
+<div id="spot"></div>
+<div id="progress"></div>
+<a href="#home" id="totop"><i class="fas fa-arrow-up"></i></a>
+
+<!-- CANVAS -->
+<canvas id="bgc"></canvas>
+<div class="bg-grid"></div>
+<div class="blobs">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+    <div class="logo"><span>&lt;</span>Dev<span>/</span>&gt;</div>
+
+    <ul class="nav-links">
+        <li><a href="#home" class="active">Accueil</a></li>
+        <li><a href="#about">À Propos</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#projects">Projets</a></li>
+        <li><a href="#experience">Expérience</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div class="btn-nav-wrap">
+        <a href="#contact" class="btn-nav">Me Contacter</a>
+    </div>
+    <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+    </div>
+</header>
+
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobileNav">
+    <a href="#home" onclick="closeMobile()">Accueil</a>
+    <a href="#about" onclick="closeMobile()">À Propos</a>
+    <a href="#services" onclick="closeMobile()">Services</a>
+    <a href="#stack" onclick="closeMobile()">Stack</a>
+    <a href="#projects" onclick="closeMobile()">Projets</a>
+    <a href="#experience" onclick="closeMobile()">Expérience</a>
+    <a href="#contact" onclick="closeMobile()">Contact</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="home" class="hero">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-content">
+                <div class="badge">{{ profile.status|default:"Disponible pour missions" }}</div>
+                <h1>
+                    <span class="hi">Bonjour, je suis SacréCodeur LMT</span>
+                    <!-- Correction : Design Titre avec couleurs séparées -->
+                    Développeur <span class="hl">Full Stack</span><br>
+                    & Admin <span class="hl2">Réseau</span>.
+                </h1>
+                <p class="hero-desc">{{ profile.bio|truncatewords:30|default:"Je conçois des applications web performantes et sécurise des infrastructures critiques." }}</p>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn-primary"><i class="fas fa-rocket" style="margin-right:8px"></i>Voir mes projets</a>
+                    <a href="{% if profile.cv %}{{ profile.cv.url }}{% else %}#{% endif %}" class="btn-ghost" target="_blank"><i class="fas fa-download" style="margin-right:8px"></i>Mon CV</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-num" data-target="{{ profile.projects_count|default:"15" }}">0</div>
+                        <div class="stat-label">Projets Réalisés</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" data-target="{{ profile.experience_years|default:"3" }}">0</div>
+                        <div class="stat-label">Ans d'Expérience</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" data-target="{{ profile.tech_count|default:"10" }}">0</div>
+                        <div class="stat-label">Technologies</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHOTO -->
+            <div class="hero-visual">
+                <div class="photo-wrap">
+                    <div class="photo-card" id="photoCard">
+                        <div class="photo-inner">
+                            {% if profile.photo %}
+                                <img src="{{ profile.photo.url }}" alt="Ma photo" style="display:block; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user photo-placeholder-icon"></i>
+                                <span class="photo-placeholder-text">// Ajoutez une photo via l'Admin</span>
+                            {% endif %}
+                            
+                            <div class="photo-scan"></div>
+                            <div class="photo-glare" id="photoGlare"></div>
+                        </div>
+                        <div class="photo-corners">
+                            <span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="photo-badge">{{ profile.status|default:"Disponible" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ À PROPOS ══ -->
+<section id="about">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">À Propos</h2>
+            <p class="section-subtitle">Qui suis-je et ce qui me passionne</p>
+        </div>
+        <div class="about-grid">
+            <div class="about-text">
+                <p>{{ profile.bio|default:"Votre biographie complète ici..."|linebreaksbr }}</p>
+            </div>
+            <div class="about-cards">
+                <div class="about-card"><i class="fas fa-code"></i><h4>Développement</h4><p>Web & Mobile full stack</p></div>
+                <div class="about-card"><i class="fas fa-network-wired"></i><h4>Réseaux</h4><p>Admin Linux, Cisco</p></div>
+                <div class="about-card"><i class="fas fa-shield-alt"></i><h4>Sécurité</h4><p>Infrastructure critique</p></div>
+                <div class="about-card"><i class="fas fa-cloud"></i><h4>Cloud & DevOps</h4><p>Docker, CI/CD</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ SERVICES ══ -->
+<section id="services">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Ce que je fais</h2>
+            <p class="section-subtitle">Mes domaines d'expertise</p>
+        </div>
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card">
+                <div class="neon-line"></div>
+                <i class="{{ service.icon_class }} svc-icon"></i>
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+            </div>
+            {% empty %}
+            <!-- Affichage par défaut si aucun service dans l'admin -->
+            <div class="service-card">
+                <div class="neon-line"></div>
+                <i class="fas fa-server svc-icon"></i>
+                <h3>Back-End Solide</h3>
+                <p>Architecture robuste avec Django & Laravel.</p>
+            </div>
+            <div class="service-card">
+                <div class="neon-line"></div>
+                <i class="fas fa-laptop-code svc-icon"></i>
+                <h3>Front-End Moderne</h3>
+                <p>Interfaces dynamiques avec React et Next.js.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ══ STACK ══ -->
+<section id="stack">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Tech Stack</h2>
+            <p class="section-subtitle">Technologies maîtrisées</p>
+        </div>
+        <div class="stack-categories">
+            {% for cat in skill_categories %}
+            <div class="stack-cat {{ cat.css_class }}">
+                <h3>{{ cat.name }}</h3>
+                <div class="skills-list">
+                    {% for skill in cat.skills.all %}
+                    <div class="skill-tag"><i class="{{ skill.icon_class }}"></i> {{ skill.name }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <!-- Stack par défaut si vide -->
+            <div class="stack-cat cat-backend">
+                <h3>Back-End</h3>
+                <div class="skills-list">
+                    <div class="skill-tag"><i class="devicon-python-plain"></i> Python</div>
+                    <div class="skill-tag"><i class="devicon-django-plain"></i> Django</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ══ PROJETS ══ -->
+<section id="projects">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Réalisations</h2>
+            <p class="section-subtitle">Projets développement & infrastructure réseau</p>
+        </div>
+
+        <div class="proj-tabs">
+            <button class="proj-tab active" data-tab="dev"><i class="fas fa-code" style="margin-right:8px"></i>Développement</button>
+            <button class="proj-tab" data-tab="reseau"><i class="fas fa-network-wired" style="margin-right:8px"></i>Réseau & Infra</button>
+        </div>
+
+        <!-- Panel DEV -->
+        <div class="proj-panel active" id="panel-dev">
+            <div class="projects-grid">
+                {% for project in projects_dev %}
+                <div class="project-card">
+                    <div class="proj-img">
+                        <img src="{% if project.image %}{{ project.image.url }}{% else %}https://via.placeholder.com/600x200/050f1e/00ffe7?text={{ project.title|slice:":5" }}{% endif %}" alt="{{ project.title }}">
+                        <span class="proj-type">{{ project.project_type }}</span>
+                    </div>
+                    <div class="proj-body">
+                        <i class="fas fa-folder-open proj-folder"></i>
+                        <h3 class="proj-title">{{ project.title }}</h3>
+                        <p class="proj-desc">{{ project.description|truncatewords:20 }}</p>
+                        <div class="proj-footer">
+                            <div class="tech-pills">
+                                {% load custom_filters %}
+                                {% for tech in project.technologies|split:"," %}
+                                <span>{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="proj-links">
+                                {% if project.link %}<a href="{{ project.link }}"><i class="fas fa-external-link-alt"></i></a>{% endif %}
+                                {% if project.github %}<a href="{{ project.github }}"><i class="fab fa-github"></i></a>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="grid-column: span 2; text-align:center; color:#8892b0;">Aucun projet de développement ajouté pour l'instant.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Panel RÉSEAU -->
+        <div class="proj-panel" id="panel-reseau">
+            <div class="projects-grid">
+                {% for project in projects_reseau %}
+                <div class="project-card">
+                    <div class="proj-img">
+                        <img src="{% if project.image %}{{ project.image.url }}{% else %}https://via.placeholder.com/600x200/1a050e/ff2d78?text={{ project.title|slice:":5" }}{% endif %}" alt="{{ project.title }}">
+                        <span class="proj-type">{{ project.project_type }}</span>
+                    </div>
+                    <div class="proj-body">
+                        <i class="fas fa-folder-open proj-folder"></i>
+                        <h3 class="proj-title">{{ project.title }}</h3>
+                        <p class="proj-desc">{{ project.description|truncatewords:20 }}</p>
+                        <div class="proj-footer">
+                            <div class="tech-pills">
+                                {% load custom_filters %}
+                                {% for tech in project.technologies|split:"," %}
+                                <span>{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="proj-links">
+                                {% if project.link %}<a href="{{ project.link }}"><i class="fas fa-external-link-alt"></i></a>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="grid-column: span 2; text-align:center; color:#8892b0;">Aucun projet réseau ajouté pour l'instant.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ EXPÉRIENCE ══ -->
+<section id="experience">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Expérience</h2>
+            <p class="section-subtitle">Mon parcours professionnel</p>
+        </div>
+        <div class="timeline">
+            {% for exp in experiences %}
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-date">{{ exp.date_range }}</div>
+                <div class="tl-card">
+                    <h4>{{ exp.title }}</h4>
+                    <div class="tl-company">{{ exp.company }}</div>
+                    <p>{{ exp.description }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Expérience par défaut si vide -->
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-date">2023 — Présent</div>
+                <div class="tl-card">
+                    <h4>Développeur Full Stack</h4>
+                    <div class="tl-company">Freelance</div>
+                    <p>Conception d'applications web et mobiles.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Contact</h2>
+            <p class="section-subtitle">Travaillons ensemble</p>
+        </div>
+        <div class="contact-wrap">
+            <div class="contact-info">
+                <h3>Intéressé par une collaboration ?</h3>
+                <p>Je suis disponible pour des missions freelance ou en équipe... N'hésitez pas à me contacter !</p>
+                <div class="contact-socials">
+                    {% for social in socials %}
+                        <a href="{{ social.url }}" class="social-btn" target="_blank"><i class="{{ social.icon_class }}"></i></a>
+                    {% empty %}
+                        <!-- LIENS PAR DÉFAUT SI VIDE DANS L'ADMIN -->
+                        <a href="https://github.com/dashboard" class="social-btn"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/feed/" class="social-btn"><i class="fab fa-linkedin"></i></a>
+                        <a href="mahangalouange757@gmail.com" class="social-btn"><i class="fas fa-envelope"></i></a>
+                        <a href=" #" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="contact-box">
+                <form action="{% url 'contact' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>// Votre nom</label>
+                        <input type="text" name="name" placeholder="Sacré Louange" required>
+                    </div>
+                    <div class="form-group">
+                        <label>// Votre email</label>
+                        <input type="email" name="email" placeholder="mahangalouange757@gmail.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>// Message</label>
+                        <textarea name="message" placeholder="Décrivez votre projet..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-send"><i class="fas fa-paper-plane" style="margin-right:8px"></i>Envoyer le message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>Conçu & Développé avec <span>♥</span> Par  SacréCodeur <span>&lt;Dev/&gt;</span> © 2026</p>
+</footer>
+
+<!-- Script JS Django -->
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>
