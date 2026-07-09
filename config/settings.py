@@ -1,11 +1,15 @@
-
-from django.contrib.messages import constants as messages
+import os
 from pathlib import Path
-import os 
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
+print("DEBUG DATABASE_URL =", os.environ.get('DATABASE_URL'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -14,8 +18,9 @@ SECRET_KEY = 'django-insecure-5r5@=m0%9o*ek)thufn$-5eg*-03x1aw@d#l+l1n1_g_9+ed=l
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -64,10 +69,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
 
 
@@ -128,3 +134,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mahangalouange757@gmal.com'  # Remplacez par votre adresse Gmail
 EMAIL_HOST_PASSWORD = 'v s w o d p b d e a r t z c o l'  # Collez le mot de passe d'application ici
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER   # config/settings.py (à la fin du fichier)
+
+load_dotenv()
